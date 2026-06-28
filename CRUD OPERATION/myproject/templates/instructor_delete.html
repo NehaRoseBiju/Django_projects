@@ -1,0 +1,35 @@
+{% extends 'forms.html' %}
+
+{% block content %}
+
+<h2>Delete Instructor</h2>
+
+<p>
+
+Are you sure you want to delete
+
+<b>{{ instructor.name }}</b> ?
+
+</p>
+
+<form method="POST">
+
+{% csrf_token %}
+
+<button class="delete" type="submit">
+
+Delete
+
+</button>
+
+</form>
+
+<br>
+
+<a href="{% url 'instructor_list' %}">
+
+Cancel
+
+</a>
+
+{% endblock %}

@@ -1,0 +1,29 @@
+{% extends 'forms.html' %}
+
+{% block content %}
+
+<h2>Instructor Form</h2>
+
+<form method="POST">
+
+{% csrf_token %}
+
+{{ form.as_p }}
+
+<button type="submit">
+
+Save
+
+</button>
+
+</form>
+
+<br>
+
+<a href="{% url 'instructor_list' %}">
+
+Back
+
+</a>
+
+{% endblock %}

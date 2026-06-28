@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Django CRUD Project</title>
+
+    <style>
+        body{
+            font-family: Arial, sans-serif;
+            background:#f5f5f5;
+            margin:40px;
+        }
+
+        .container{
+            background:white;
+            padding:20px;
+            border-radius:10px;
+            box-shadow:0px 0px 10px lightgray;
+        }
+
+        a{
+            text-decoration:none;
+            color:white;
+            background:#007BFF;
+            padding:8px 12px;
+            border-radius:5px;
+        }
+
+        table{
+            width:100%;
+            border-collapse:collapse;
+            margin-top:20px;
+        }
+
+        table,th,td{
+            border:1px solid gray;
+        }
+
+        th,td{
+            padding:10px;
+            text-align:center;
+        }
+
+        input,textarea,select{
+            width:100%;
+            padding:8px;
+            margin-top:5px;
+            margin-bottom:15px;
+        }
+
+        button{
+            background:green;
+            color:white;
+            border:none;
+            padding:10px 15px;
+            cursor:pointer;
+        }
+
+        button:hover{
+            background:darkgreen;
+        }
+
+        .delete{
+            background:red;
+        }
+
+        .delete:hover{
+            background:darkred;
+        }
+    </style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>Django CRUD Application</h1>
+
+<hr>
+
+<a href="{% url 'course_list' %}">Courses</a>
+
+<a href="{% url 'instructor_list' %}">Instructors</a>
+
+<hr>
+
+{% block content %}
+
+{% endblock %}
+
+</div>
+
+</body>
+</html>

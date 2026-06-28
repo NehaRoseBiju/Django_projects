@@ -1,0 +1,55 @@
+{% extends 'forms.html' %}
+
+{% block content %}
+
+<h2>Course List</h2>
+
+<br>
+
+<a href="{% url 'course_create' %}">Add Course</a>
+
+<table>
+
+<tr>
+
+<th>Title</th>
+
+<th>Description</th>
+
+<th>Update</th>
+
+<th>Delete</th>
+
+</tr>
+
+{% for course in courses %}
+
+<tr>
+
+<td>{{ course.title }}</td>
+
+<td>{{ course.description }}</td>
+
+<td>
+
+<a href="{% url 'course_update' course.id %}">
+Update
+</a>
+
+</td>
+
+<td>
+
+<a href="{% url 'course_delete' course.id %}">
+Delete
+</a>
+
+</td>
+
+</tr>
+
+{% endfor %}
+
+</table>
+
+{% endblock %}
