@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IoT Temperature Monitoring System</title>
+    <!-- Google Font: Outfit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Header -->
+        <header class="dashboard-header">
+            <div class="logo-area">
+                <span class="pulse-icon"></span>
+              
+            </div>
+            <div class="header-status">
+                <span id="connectionBadge" class="status-badge active">System Live</span>
+            </div>
+        </header>
+
+        <!-- Main Content Grid -->
+        <div class="dashboard-grid">
+            <!-- Left Panel: Stats and Controls -->
+            <div class="control-panel">
+                <!-- Current Temp Card -->
+                <div class="glass-card current-temp-card">
+                    <div class="card-header">
+                        <h3>Current Reading</h3>
+                        <span class="icon">🌡️</span>
+                    </div>
+                    <div class="temp-display">
+                        <span id="currentTemp">-- °C</span>
+                        <div class="status-indicator">
+                            <span id="tempStatusBadge" class="badge">Checking...</span>
+                        </div>
+                    </div>
+                    <div class="thermometer-track">
+                        <div id="thermometerBar" class="thermometer-fill" style="width: 0%"></div>
+                    </div>
+                    <div class="temp-read-meta">
+                        <span>Last updated: <span id="lastUpdatedTime">--:--:--</span></span>
+                    </div>
+                </div>
+
+                <!-- Filters & Action Controls -->
+                <div class="glass-card controls-card">
+                    <h3>Dashboard Controls</h3>
+                    
+                    <div class="filter-group">
+                        <label for="filterStart">Start Date & Time</label>
+                        <input type="datetime-local" id="filterStart" class="form-input">
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label for="filterEnd">End Date & Time</label>
+                        <input type="datetime-local" id="filterEnd" class="form-input">
+                    </div>
+
+                    <div class="button-row">
+                        <button id="applyFilterBtn" class="btn btn-primary">Apply Filter</button>
+                        <button id="clearFilterBtn" class="btn btn-secondary">Clear</button>
+                    </div>
+
+                    <hr class="divider">
+
+                    <div class="action-switches">
+                        <div class="switch-container">
+                            <label class="switch-label" for="autoRefreshToggle">
+                                <span class="label-text">Auto-Refresh (5s)</span>
+                                <input type="checkbox" id="autoRefreshToggle" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="action-buttons">
+                        <button id="forceReloadBtn" class="btn btn-accent btn-block">Force Reload Data</button>
+                        <button id="exportCsvBtn" class="btn btn-success btn-block">Export CSV Records</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Panel: Visualization & Table -->
+            <div class="content-panel">
+                <!-- Line Chart Card -->
+                <div class="glass-card chart-card">
+                    <div class="card-header">
+                        <h3>Temperature Visualization (Time Series)</h3>
+                        <span class="chart-stats" id="chartStatsText">-- records</span>
+                    </div>
+                    <div class="chart-wrapper">
+                        <canvas id="tempChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Table Card -->
+                <div class="glass-card table-card">
+                    <div class="card-header">
+                        <h3>Recorded History Logs</h3>
+                    </div>
+                    <div class="table-scroll">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Temperature</th>
+                                    <th>Date</th>
+                                    <th>Timestamp</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tableBody">
+                                <tr>
+                                    <td colspan="4" class="text-center text-muted">Retrieving data logs...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chart.js and Custom Script -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
