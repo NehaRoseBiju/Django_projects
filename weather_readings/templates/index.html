@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<title>Weather Dashboard</title>
+
+<meta http-equiv="refresh" content="60">
+
+<link rel="stylesheet"
+href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+
+<body>
+
+<h1>Kochi Weather Monitoring</h1>
+
+<h2>Current Temperature</h2>
+
+<h1>{{ current }} °C</h1>
+
+{{ graph|safe }}
+
+<h2>Recent Readings</h2>
+
+{{ table|safe }}
+
+</body>
+
+</html>
