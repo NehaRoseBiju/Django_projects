@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Available Flights</h2>
+<table border="1" cellpadding="10" cellspacing="0" width="100%">
+    <tr>
+        <th>Flight No</th>
+        <th>Source</th>
+        <th>Destination</th>
+        <th>Date</th>
+        <th>Time</th>
+        <th>Price</th>
+        <th>Seats</th>
+        <th>Book</th>
+        <th>Update</th>
+        <th>Delete</th>
+    </tr>
+    {% for flight in flights %}
+    <tr>
+        <td>{{ flight.flight_no }}</td>
+        <td>{{ flight.source }}</td>
+        <td>{{ flight.destination }}</td>
+        <td>{{ flight.departure_date }}</td>
+        <td>{{ flight.departure_time }}</td>
+        <td>₹{{ flight.price }}</td>
+        <td>{{ flight.seats }}</td>
+        <td>
+            <a href="{% url 'book_flight' flight.id %}" class="btn book">
+                Book
+            </a>
+        </td>
+        <td>
+            <a href="{% url 'update_flight' flight.id %}" class="btn update">
+                Update
+            </a>
+        </td>
+        <td>
+            <a href="{% url 'delete_flight' flight.id %}" class="btn delete">
+                Delete
+            </a>
+        </td>
+
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}

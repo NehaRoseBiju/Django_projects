@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="card">
+    <form method="POST">
+        {% csrf_token %}
+        <input type="text" name="flight_no" placeholder="Flight Number">
+        <input type="text" name="source" placeholder="Source">
+        <input type="text" name="destination" placeholder="Destination">
+        <input type="date" name="departure_date">
+        <input type="time" name="departure_time">
+        <input type="number" name="price" placeholder="Price">
+        <input type="number" name="seats" placeholder="Seats">
+        <button type="submit">Save Flight</button>
+    </form>
+</div>
+{% endblock %}

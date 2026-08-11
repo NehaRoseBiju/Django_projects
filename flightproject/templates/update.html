@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Update Flight</h2>
+<div class="card">
+    <form method="POST">
+        {% csrf_token %}
+        <input type="text" name="flight_no" value="{{ flight.flight_no }}" placeholder="Flight Number">
+        <input type="text" name="source" value="{{ flight.source }}" placeholder="Source">
+        <input type="text" name="destination" value="{{ flight.destination }}" placeholder="Destination">
+        <input type="date" name="departure_date" value="{{ flight.departure_date|date:'Y-m-d' }}">
+        <input type="time" name="departure_time" value="{{ flight.departure_time|time:'H:i' }}">
+        <input type="number" name="price" value="{{ flight.price }}" placeholder="Price">
+        <input type="number" name="seats" value="{{ flight.seats }}"placeholder="Seats">
+        <button type="submit">Update Flight</button>
+    </form>
+</div>
+{% endblock %}

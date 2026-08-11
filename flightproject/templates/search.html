@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="card">
+<form method="GET">
+<input type="text" name="source" placeholder="Source">
+<input type="text" name="destination" placeholder="Destination">
+<button>
+Search
+</button>
+</form>
+</div>
+{% for flight in flights %}
+<div class="card">
+<h3>{{flight.flight_no}}</h3>
+<p>{{flight.source}} → {{flight.destination}}</p>
+</div>
+{% endfor %}
+{% endblock %}
