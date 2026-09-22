@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100%" height="100%">
+  <defs>
+    <linearGradient id="iconGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2dd4bf"/>
+      <stop offset="100%" stop-color="#0d9488"/>
+    </linearGradient>
+  </defs>
+  <path d="M 50,90 C 20,65 2,45 2,28 C 2,14 14,4 28,4 C 38,4 46,10 50,18 C 54,10 62,4 72,4 C 86,4 98,14 98,28 C 98,45 80,65 50,90 Z" fill="url(#iconGrad)"/>
+  <path d="M 12,46 L 28,46 L 34,36 L 42,58 L 50,22 L 58,52 L 64,46 L 88,46" fill="none" stroke="#ffffff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="76" cy="22" r="14" fill="#ffffff"/>
+  <circle cx="76" cy="22" r="11" fill="#0f766e"/>
+  <path d="M 74,15 H 78 V 20 H 83 V 24 H 78 V 29 H 74 V 24 H 69 V 20 H 74 Z" fill="#ffffff"/>
+</svg>

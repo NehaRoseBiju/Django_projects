@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block title %}Create Wellness Habit - PulseMind Hub{% endblock %}
+
+{% block content %}
+<div style="max-width: 600px; margin: 0 auto;">
+  <div class="card">
+    <div class="card-header">
+      <h2>🎯 Create Customizable Habit</h2>
+    </div>
+    <form method="POST">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <div style="margin-top: 1.5rem; text-align: right;">
+        <a href="{% url 'wellness:index' %}" class="btn btn-secondary">Cancel</a>
+        <button type="submit" class="btn btn-primary">Create Habit</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

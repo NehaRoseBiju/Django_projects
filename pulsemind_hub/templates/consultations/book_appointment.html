@@ -1,0 +1,127 @@
+{% extends 'base.html' %}
+
+{% block title %}Book Consultation - Dr. {{ doctor.username }}{% endblock %}
+
+{% block content %}
+<div style="max-width: 720px; margin: 0 auto;">
+  <div class="card" style="box-shadow: var(--shadow-md); background: #ffffff;">
+    
+    <!-- DOCTOR HEADER -->
+    <div style="display: flex; align-items: center; gap: 1.25rem; margin-bottom: 1.5rem; padding-bottom: 1.25rem; border-bottom: 1px solid #e2e8f0;">
+      <div style="width: 68px; height: 68px; border-radius: 50%; background: var(--primary-light); color: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 2.2rem; border: 2px solid var(--accent);">
+        
+      </div>
+      <div>
+        <h2 style="margin: 0; color: #064e3b; font-size: 1.6rem;">Dr. {{ doctor.get_full_name|default:doctor.username }}</h2>
+        <p style="color: var(--muted-text); font-size: 0.925rem; margin-top: 0.2rem;">
+          Specialization: <strong style="color: #0f766e;">{{ doctor.specialization|default:"General Medicine" }}</strong> 
+          • Qualification: <strong>{{ doctor.qualification|default:"MBBS" }}</strong>
+        </p>
+        <div style="margin-top: 0.35rem; display: flex; align-items: center; gap: 1rem;">
+          <span style="color: #047857; font-weight: 700; font-size: 1.1rem; background: #d1fae5; padding: 0.2rem 0.75rem; border-radius: 50px; border: 1px solid #6ee7b7;">
+            Consultation Fee: ₹{{ doctor.consultation_fee }}
+          </span>
+          <span style="font-size: 0.85rem; color: var(--muted-text);">
+            Available Slots: <strong>{{ available_slots_count }}</strong>
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <form method="POST">
+      {% csrf_token %}
+
+      <!-- TIME SLOTS SELECTION -->
+      <div class="form-group">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+          <label class="form-label" style="font-size: 1rem; color: #0f172a; margin: 0;">Select Consultation Time Slot</label>
+          <span style="font-size: 0.8rem; color: var(--muted-text);">
+            🟢 Available &nbsp; | &nbsp; 🔴 Booked (Disabled)
+          </span>
+        </div>
+
+        {% if slots %}
+          <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.85rem;">
+            {% for slot in slots %}
+              {% if slot.is_booked %}
+                <!-- BOOKED / DISABLED SLOT -->
+                <div style="border: 2px dashed #cbd5e1; background-color: #f8fafc; border-radius: var(--radius-sm); padding: 0.85rem 1rem; display: flex; align-items: center; justify-content: space-between; opacity: 0.65; cursor: not-allowed; position: relative;">
+                  <div style="display: flex; align-items: center; gap: 0.6rem;">
+                    <input type="radio" name="slot_id" value="{{ slot.id }}" disabled style="cursor: not-allowed; width: 18px; height: 18px;">
+                    <div>
+                      <div style="font-weight: 600; color: #64748b; font-size: 0.9rem; text-decoration: line-through;">
+                        {{ slot.date }}
+                      </div>
+                      <div style="font-size: 0.825rem; color: #94a3b8;">
+                        {{ slot.start_time|time:"H:i" }} - {{ slot.end_time|time:"H:i" }}
+                      </div>
+                    </div>
+                  </div>
+                  <span class="badge" style="background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; font-size: 0.65rem;">
+                    🔴 BOOKED
+                  </span>
+                </div>
+              {% else %}
+                <!-- AVAILABLE / ACTIVE SLOT -->
+                <label style="border: 2px solid #a7f3d0; background-color: #ffffff; border-radius: var(--radius-sm); padding: 0.85rem 1rem; cursor: pointer; display: flex; align-items: center; justify-content: space-between; transition: var(--transition);" onmouseover="this.style.borderColor='#0d9488'; this.style.boxShadow='var(--shadow-sm)';" onmouseout="this.style.borderColor='#a7f3d0'; this.style.boxShadow='none';">
+                  <div style="display: flex; align-items: center; gap: 0.6rem;">
+                    <input type="radio" name="slot_id" value="{{ slot.id }}" required style="cursor: pointer; width: 18px; height: 18px; accent-color: var(--primary);">
+                    <div>
+                      <div style="font-weight: 700; color: #064e3b; font-size: 0.925rem;">
+                        📅 {{ slot.date }}
+                      </div>
+                      <div style="font-size: 0.85rem; color: #0d9488; font-weight: 500;">
+                        {{ slot.start_time|time:"H:i" }} - {{ slot.end_time|time:"H:i" }}
+                      </div>
+                    </div>
+                  </div>
+                  <span class="badge badge-paid" style="font-size: 0.65rem;">
+                    🟢 AVAILABLE
+                  </span>
+                </label>
+              {% endif %}
+            {% endfor %}
+          </div>
+        {% else %}
+          <div style="padding: 2rem; text-align: center; background: #f8fafc; border-radius: var(--radius-md); border: 1px dashed #cbd5e1;">
+            <div style="font-size: 1.5rem; margin-bottom: 0.5rem;"></div>
+            <p style="color: #64748b; font-weight: 600; margin: 0;">No consultation slots currently listed for Dr. {{ doctor.username }}.</p>
+          </div>
+        {% endif %}
+      </div>
+
+      <!-- SYMPTOMS NOTES -->
+      <div class="form-group" style="margin-top: 1.5rem;">
+        <label class="form-label" style="font-size: 0.95rem; color: #0f172a;">Symptoms & Reason for Consultation *</label>
+        <textarea name="symptoms_notes" class="form-control" rows="4" placeholder="Briefly describe your current health condition, medical history, or symptoms..." required></textarea>
+      </div>
+
+      <!-- PAYMENT NOTICE -->
+      <div style="background: var(--primary-subtle); border: 1px solid #a7f3d0; border-radius: var(--radius-sm); padding: 1rem; margin: 1.5rem 0; font-size: 0.875rem; color: #065f46; display: flex; align-items: center; gap: 0.75rem;">
+        <span style="font-size: 1.4rem;">💳</span>
+        <div>
+          <strong>Instant Appointment Confirmation:</strong> Selecting an available slot and submitting will reserve the time slot and open the Payment Gateway for <strong>₹{{ doctor.consultation_fee }}</strong>.
+        </div>
+      </div>
+
+      <!-- FOOTER ACTIONS -->
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1.5rem;">
+        <a href="{% url 'consultations:doctors' %}" class="btn btn-secondary">
+          ← Back to Doctor Directory
+        </a>
+        
+        {% if available_slots_count > 0 %}
+        <button type="submit" class="btn btn-primary" style="padding: 0.75rem 1.75rem; background: linear-gradient(135deg, #0d9488 0%, #064e3b 100%);">
+          Proceed to Payment (₹{{ doctor.consultation_fee }}) →
+        </button>
+        {% else %}
+        <button type="button" class="btn btn-secondary" disabled style="opacity: 0.6; cursor: not-allowed;">
+          No Available Slots to Book
+        </button>
+        {% endif %}
+      </div>
+
+    </form>
+  </div>
+</div>
+{% endblock %}

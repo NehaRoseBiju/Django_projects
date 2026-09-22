@@ -1,0 +1,162 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Doctor Portal - PulseMind Hub{% endblock %}
+
+{% block content %}
+
+<div style="background: linear-gradient(135deg, #0f766e 0%, #115e59 100%); color: #ffffff; padding: 2rem; border-radius: var(--radius-lg); margin-bottom: 2rem; box-shadow: var(--shadow-md); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+
+    <div>
+        <span style="background: rgba(255,255,255,0.2); padding: 0.35rem 0.85rem; border-radius: 50px; font-size: 0.8rem; font-weight: 600; text-transform: uppercase;">
+            Doctor Practice Console
+        </span>
+
+        <h1 style="color: #ffffff; margin: 0.5rem 0 0.25rem; font-size: 2rem;">
+            Dr. {{ user.get_full_name|default:user.username }}
+        </h1>
+
+        <p style="opacity: 0.9; font-size: 0.95rem; margin: 0;">
+            Specialization: {{ user.specialization|default:"General Practice" }}
+            |
+            Qualification: {{ user.qualification|default:"MBBS" }}
+        </p>
+    </div>
+
+    <div>
+        <a href="{% url 'consultations:manage_slots' %}"
+           class="btn btn-primary"
+           style="background: #ffffff; color: #0f766e; font-weight: 700;">
+            Manage Time Slots
+        </a>
+    </div>
+
+</div>
+
+<!-- STAT CARDS -->
+<div class="grid-3" style="margin-bottom: 2rem;">
+
+    <div class="stat-card">
+        <div class="stat-icon">MC</div>
+        <div>
+            <div class="stat-value">{{ total_consultations }}</div>
+            <div class="stat-label">Confirmed Consultations</div>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon" style="background: #d1fae5; color: #047857;">₹</div>
+        <div>
+            <div class="stat-value">₹{{ total_earnings }}</div>
+            <div class="stat-label">Total Earnings</div>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon" style="background: #e0f2fe; color: #0284c7;">VC</div>
+        <div>
+            <div class="stat-value">{{ upcoming_appointments.count }}</div>
+            <div class="stat-label">Upcoming Video Rooms</div>
+        </div>
+    </div>
+
+</div>
+
+<!-- UPCOMING CONSULTATION ROSTER -->
+<div class="card">
+
+    <div class="card-header">
+        <h3>Scheduled Consultation Appointments</h3>
+
+        <a href="{% url 'consultations:my_consultations' %}"
+           class="btn btn-secondary btn-sm">
+            Full Roster
+        </a>
+    </div>
+
+    {% if upcoming_appointments %}
+
+    <table style="width: 100%; border-collapse: collapse; margin-top: 0.5rem;">
+
+        <thead>
+            <tr style="border-bottom: 2px solid #e2e8f0; text-align: left; font-size: 0.85rem; color: var(--muted-text);">
+                <th style="padding: 0.75rem;">Patient Name</th>
+                <th style="padding: 0.75rem;">Date & Time</th>
+                <th style="padding: 0.75rem;">Symptoms / Notes</th>
+                <th style="padding: 0.75rem;">Payment Status</th>
+                <th style="padding: 0.75rem; text-align: right;">Action</th>
+            </tr>
+        </thead>
+
+        <tbody>
+
+            {% for appt in upcoming_appointments %}
+
+            <tr style="border-bottom: 1px solid #f1f5f9; font-size: 0.9rem;">
+
+                <td style="padding: 1rem; font-weight: 600; color: #064e3b;">
+                    {{ appt.patient.get_full_name|default:appt.patient.username }}
+                </td>
+
+                <td style="padding: 1rem;">
+                    {{ appt.appointment_date }} @ {{ appt.appointment_time }}
+                </td>
+
+                <td style="padding: 1rem; color: var(--muted-text);">
+                    {{ appt.symptoms_notes|default:"No notes provided" }}
+                </td>
+
+                <td style="padding: 1rem;">
+                    <span class="badge badge-paid">
+                        PAID (₹{{ appt.fee }})
+                    </span>
+                </td>
+
+                <td style="padding: 1rem; text-align: right;">
+
+                    <div style="display: flex; gap: 0.5rem; justify-content: flex-end; align-items: center;">
+
+                        <a href="{% url 'consultations:video_room' appt.meeting_room_id %}"
+                           class="btn btn-primary btn-sm">
+                            Start Video Call
+                        </a>
+
+                        <form method="POST"
+                              action="{% url 'consultations:cancel_appointment' appt.id %}"
+                              style="display: inline;"
+                              onsubmit="return confirm('Cancel appointment with patient {{ appt.patient.get_full_name|default:appt.patient.username }}?');">
+
+                            {% csrf_token %}
+
+                            <button type="submit"
+                                    class="btn btn-sm"
+                                    style="background: #fff1f2; color: #e11d48; border: 1px solid #fecdd3;"
+                                    title="Cancel Booking">
+                                Cancel
+                            </button>
+
+                        </form>
+
+                    </div>
+
+                </td>
+
+            </tr>
+
+            {% endfor %}
+
+        </tbody>
+
+    </table>
+
+    {% else %}
+
+    <div style="text-align: center; padding: 2rem; color: var(--muted-text);">
+        No scheduled consultation appointments currently.
+    </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,240 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Admin Dashboard - PulseMind Hub Control Center{% endblock %}
+
+{% block content %}
+<div style="display: flex; flex-direction: column; gap: 1.75rem;">
+
+  <!-- WELCOME HEADER BANNER -->
+  <div style="background: linear-gradient(135deg, #0f172a 0%, #064e3b 100%); color: #ffffff; padding: 2rem; border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1.5rem;">
+    <div>
+      <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
+        <span style="background: rgba(45, 212, 191, 0.2); color: var(--accent); padding: 0.25rem 0.75rem; border-radius: 50px; font-size: 0.8rem; font-weight: 700; border: 1px solid rgba(45, 212, 191, 0.4);">
+          Master Administrator
+        </span>
+        <span style="color: #94a3b8; font-size: 0.85rem;">System Operational 🟢</span>
+      </div>
+      <h1 style="color: #ffffff; font-size: 2rem; margin: 0;">Welcome, Administrator {{ user.first_name|default:user.username }}!</h1>
+      <p style="color: #cbd5e1; margin-top: 0.35rem; font-size: 0.95rem;">
+        Complete platform oversight: Manage users, review appointments, monitor financial transactions, and configure system rules.
+      </p>
+    </div>
+
+    <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+      <a href="{% url 'accounts:admin_user_add' %}" class="btn btn-primary" style="background: var(--secondary);">
+        Add New User / Doctor
+      </a>
+      <a href="{% url 'accounts:admin_user_list' %}" class="btn btn-secondary">
+        Manage Users
+      </a>
+      <a href="/admin/" target="_blank" class="btn btn-secondary" style="background: rgba(255,255,255,0.1); color: #ffffff; border-color: rgba(255,255,255,0.3);">
+        Django Core Admin
+      </a>
+    </div>
+  </div>
+
+  <!-- STATS OVERVIEW CARDS -->
+  <div class="grid-4">
+    <!-- Total Users -->
+    <div class="stat-card">
+      <div class="stat-icon" style="background: #e0f2fe; color: #0284c7;"></div>
+      <div>
+        <div class="stat-value">{{ total_users }}</div>
+        <div class="stat-label">Total Platform Users</div>
+        <div style="font-size: 0.75rem; color: var(--muted-text); margin-top: 0.2rem;">
+          {{ total_patients }} Patients • {{ total_doctors }} Doctors • {{ total_admins }} Admins
+        </div>
+      </div>
+    </div>
+
+    <!-- Total Revenue -->
+    <div class="stat-card">
+      <div class="stat-icon" style="background: #d1fae5; color: #059669;"></div>
+      <div>
+        <div class="stat-value">₹{{ total_revenue|floatformat:2 }}</div>
+        <div class="stat-label">Total Completed Revenue</div>
+        <div style="font-size: 0.75rem; color: #047857; margin-top: 0.2rem;">
+          Across all UPI & Card consultations
+        </div>
+      </div>
+    </div>
+
+    <!-- Total Consultations -->
+    <div class="stat-card">
+      <div class="stat-icon" style="background: #fef3c7; color: #d97706;">🩺</div>
+      <div>
+        <div class="stat-value">{{ total_appointments }}</div>
+        <div class="stat-label">Total Consultations</div>
+        <div style="font-size: 0.75rem; color: #b45309; margin-top: 0.2rem;">
+          {{ completed_appointments }} Completed • {{ pending_appointments }} Active/Scheduled
+        </div>
+      </div>
+    </div>
+
+    <!-- Registered Doctors -->
+    <div class="stat-card">
+      <div class="stat-icon" style="background: #ccfbf1; color: #0d9488;">👨</div>
+      <div>
+        <div class="stat-value">{{ total_doctors }}</div>
+        <div class="stat-label">Active Verified Doctors</div>
+        <div style="font-size: 0.75rem; color: var(--primary-hover); margin-top: 0.2rem;">
+          Medical Specialists & Physicians
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- QUICK ACTION SHORTCUTS -->
+  <div class="card" style="background: #ffffff;">
+    <div class="card-header">
+      <h3 style="margin: 0; font-size: 1.15rem; color: #0f172a;">Quick Administration Shortcuts</h3>
+    </div>
+    <div class="grid-4" style="gap: 1rem;">
+      <a href="{% url 'accounts:admin_user_list' %}" style="display: flex; align-items: center; gap: 1rem; padding: 1rem; border: 1.5px solid #e2e8f0; border-radius: var(--radius-md); background: #f8fafc; color: #0f172a; font-weight: 600; text-decoration: none; transition: var(--transition);">
+        <span style="font-size: 1.6rem;">👥</span>
+        <div>
+          <div>User Management</div>
+          <div style="font-size: 0.8rem; color: var(--muted-text); font-weight: 400;">View, edit, suspend or delete users</div>
+        </div>
+      </a>
+
+      <a href="{% url 'accounts:admin_user_add' %}" style="display: flex; align-items: center; gap: 1rem; padding: 1rem; border: 1.5px solid #e2e8f0; border-radius: var(--radius-md); background: #f8fafc; color: #0f172a; font-weight: 600; text-decoration: none; transition: var(--transition);">
+        <span style="font-size: 1.6rem;">➕</span>
+        <div>
+          <div>Add User / Doctor</div>
+          <div style="font-size: 0.8rem; color: var(--muted-text); font-weight: 400;">Create new patient or doctor profiles</div>
+        </div>
+      </a>
+
+      <a href="{% url 'accounts:admin_consultations' %}" style="display: flex; align-items: center; gap: 1rem; padding: 1rem; border: 1.5px solid #e2e8f0; border-radius: var(--radius-md); background: #f8fafc; color: #0f172a; font-weight: 600; text-decoration: none; transition: var(--transition);">
+        <span style="font-size: 1.6rem;"></span>
+        <div>
+          <div>All Consultations</div>
+          <div style="font-size: 0.8rem; color: var(--muted-text); font-weight: 400;">Monitor appointment status & WebRTC rooms</div>
+        </div>
+      </a>
+
+      <a href="{% url 'accounts:admin_payments' %}" style="display: flex; align-items: center; gap: 1rem; padding: 1rem; border: 1.5px solid #e2e8f0; border-radius: var(--radius-md); background: #f8fafc; color: #0f172a; font-weight: 600; text-decoration: none; transition: var(--transition);">
+        <span style="font-size: 1.6rem;">💳</span>
+        <div>
+          <div>Financial Audit</div>
+          <div style="font-size: 0.8rem; color: var(--muted-text); font-weight: 400;">Review all transactions & doctor payouts</div>
+        </div>
+      </a>
+    </div>
+  </div>
+
+  <!-- RECENT USERS & CONSULTATIONS DUAL GRID -->
+  <div class="grid-2">
+
+    <!-- RECENTLY REGISTERED USERS -->
+    <div class="card">
+      <div class="card-header">
+        <h3 style="margin: 0; font-size: 1.1rem; color: #0f172a;">Recent User Registrations</h3>
+        <a href="{% url 'accounts:admin_user_list' %}" style="font-size: 0.85rem; font-weight: 600;">View All Users →</a>
+      </div>
+      
+      <div style="overflow-x: auto;">
+        <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem;">
+          <thead>
+            <tr style="border-bottom: 2px solid #e2e8f0; color: var(--muted-text);">
+              <th style="padding: 0.75rem 0.5rem;">User</th>
+              <th style="padding: 0.75rem 0.5rem;">Role</th>
+              <th style="padding: 0.75rem 0.5rem;">Joined</th>
+              <th style="padding: 0.75rem 0.5rem; text-align: right;">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for u in recent_users %}
+            <tr style="border-bottom: 1px solid #f1f5f9;">
+              <td style="padding: 0.75rem 0.5rem;">
+                <div style="display: flex; align-items: center; gap: 0.6rem;">
+                  <div style="width: 32px; height: 32px; border-radius: 50%; background: #e0f2fe; color: #0369a1; font-weight: 700; display: flex; align-items: center; justify-content: center; font-size: 0.8rem;">
+                    {{ u.username|slice:":1"|upper }}
+                  </div>
+                  <div>
+                    <div style="font-weight: 600; color: #0f172a;">{{ u.get_full_name|default:u.username }}</div>
+                    <div style="font-size: 0.75rem; color: var(--muted-text);">{{ u.email }}</div>
+                  </div>
+                </div>
+              </td>
+              <td style="padding: 0.75rem 0.5rem;">
+                {% if u.is_admin %}
+                  <span class="badge" style="background: #fef3c7; color: #92400e;">ADMIN</span>
+                {% elif u.is_doctor %}
+                  <span class="badge badge-doctor">DOCTOR</span>
+                {% else %}
+                  <span class="badge badge-patient">PATIENT</span>
+                {% endif %}
+              </td>
+              <td style="padding: 0.75rem 0.5rem; font-size: 0.8rem; color: var(--muted-text);">
+                {{ u.date_joined|date:"M d, Y" }}
+              </td>
+              <td style="padding: 0.75rem 0.5rem; text-align: right;">
+                <a href="{% url 'accounts:admin_user_edit' u.id %}" class="btn btn-secondary btn-sm" style="padding: 0.25rem 0.6rem; font-size: 0.75rem;">
+                  ✏️ Edit
+                </a>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- RECENT CONSULTATIONS & APPOINTMENTS -->
+    <div class="card">
+      <div class="card-header">
+        <h3 style="margin: 0; font-size: 1.1rem; color: #0f172a;"> Recent Consultations</h3>
+        <a href="{% url 'accounts:admin_consultations' %}" style="font-size: 0.85rem; font-weight: 600;">View All →</a>
+      </div>
+      
+      <div style="overflow-x: auto;">
+        <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem;">
+          <thead>
+            <tr style="border-bottom: 2px solid #e2e8f0; color: var(--muted-text);">
+              <th style="padding: 0.75rem 0.5rem;">Patient / Doctor</th>
+              <th style="padding: 0.75rem 0.5rem;">Date & Time</th>
+              <th style="padding: 0.75rem 0.5rem;">Fee</th>
+              <th style="padding: 0.75rem 0.5rem; text-align: right;">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for appt in recent_appointments %}
+            <tr style="border-bottom: 1px solid #f1f5f9;">
+              <td style="padding: 0.75rem 0.5rem;">
+                <div style="font-weight: 600; color: #0f172a;">{{ appt.patient.get_full_name|default:appt.patient.username }}</div>
+                <div style="font-size: 0.75rem; color: var(--muted-text);">with Dr. {{ appt.doctor.get_full_name|default:appt.doctor.username }}</div>
+              </td>
+              <td style="padding: 0.75rem 0.5rem; font-size: 0.8rem;">
+                <div>{{ appt.appointment_date }}</div>
+                <div style="color: var(--muted-text);">{{ appt.appointment_time|time:"H:i" }}</div>
+              </td>
+              <td style="padding: 0.75rem 0.5rem; font-weight: 600; color: #047857;">
+                ₹{{ appt.fee }}
+              </td>
+              <td style="padding: 0.75rem 0.5rem; text-align: right;">
+                {% if appt.payment_status == 'PAID' %}
+                  <span class="badge badge-paid">PAID</span>
+                {% else %}
+                  <span class="badge badge-pending">PENDING</span>
+                {% endif %}
+              </td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="4" style="text-align: center; padding: 1.5rem; color: var(--muted-text);">
+                No consultations recorded yet.
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+{% endblock %}

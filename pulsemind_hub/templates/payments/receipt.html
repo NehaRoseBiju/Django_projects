@@ -1,0 +1,152 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Payment Receipt #{{ transaction.transaction_id }} - PulseMind Hub{% endblock %}
+
+{% block content %}
+
+<div style="max-width: 640px; margin: 2rem auto;">
+
+    <div class="card" style="box-shadow: var(--shadow-lg); border-top: 5px solid var(--secondary);">
+
+        <!-- RECEIPT HEADER -->
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; padding-bottom: 1.25rem; border-bottom: 2px solid #e2e8f0; margin-bottom: 1.5rem;">
+
+            <div>
+                <img src="{% static 'images/logo.svg' %}"
+                     alt="PulseMind Hub"
+                     style="height: 48px; margin-bottom: 0.5rem;">
+
+                <h2 style="font-size: 1.35rem; color: #064e3b;">
+                    Payment Receipt & GST Invoice
+                </h2>
+
+                <div style="font-size: 0.85rem; color: var(--muted-text);">
+                    Transaction ID:
+                    <strong>{{ transaction.transaction_id }}</strong>
+                </div>
+            </div>
+
+            <div style="text-align: right;">
+
+                <span class="badge badge-paid"
+                      style="font-size: 0.85rem; padding: 0.4rem 0.85rem;">
+                    PAID SUCCESS
+                </span>
+
+                <div style="font-size: 0.8rem; color: var(--muted-text); margin-top: 0.35rem;">
+                    Date: {{ transaction.created_at|date:"M d, Y - H:i" }} IST
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- DETAILS -->
+        <div style="margin-bottom: 1.5rem;">
+
+            <div class="grid-2" style="margin-bottom: 1rem;">
+
+                <div>
+
+                    <label style="font-size: 0.8rem; color: var(--muted-text); font-weight: 600; text-transform: uppercase;">
+                        Billed To (Patient):
+                    </label>
+
+                    <div style="font-weight: 700; color: #064e3b;">
+                        {{ patient.get_full_name|default:patient.username }}
+                    </div>
+
+                    <div style="font-size: 0.85rem; color: var(--muted-text);">
+                        Email: {{ patient.email|default:"patient@pulsemind.in" }}
+                    </div>
+
+                </div>
+
+                <div>
+
+                    <label style="font-size: 0.8rem; color: var(--muted-text); font-weight: 600; text-transform: uppercase;">
+                        Healthcare Provider (Doctor):
+                    </label>
+
+                    <div style="font-weight: 700; color: #064e3b;">
+                        Dr. {{ doctor.get_full_name|default:doctor.username }}
+                    </div>
+
+                    <div style="font-size: 0.85rem; color: var(--muted-text);">
+                        Specialty: {{ doctor.specialization|default:"General Medicine" }}
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: var(--radius-sm); padding: 1rem; margin-top: 1rem;">
+
+                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+
+                    <span>
+                        Video Consultation Fee (Appointment #{{ appointment.id }})
+                    </span>
+
+                    <strong>₹{{ transaction.amount }}</strong>
+
+                </div>
+
+                <div style="display: flex; justify-content: space-between; font-size: 0.85rem; color: var(--muted-text);">
+
+                    <span>
+                        Payment Method: {{ transaction.get_payment_method_display }}
+                    </span>
+
+                    <span>
+                        Status: Verified via NPCI
+                    </span>
+
+                </div>
+
+                <hr style="border: 0; border-top: 1px dashed #cbd5e1; margin: 0.75rem 0;">
+
+                <div style="display: flex; justify-content: space-between; font-size: 1.15rem; color: #064e3b;">
+
+                    <strong>Total Paid Amount:</strong>
+
+                    <strong style="color: #0d9488;">
+                        ₹{{ transaction.amount }}
+                    </strong>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- ACTION BUTTONS -->
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem;">
+
+            <a href="{% url 'payments:history' %}"
+               class="btn btn-secondary btn-sm">
+                Back to Payment History
+            </a>
+
+            <div style="display: flex; gap: 0.75rem;">
+
+                <button onclick="window.print()"
+                        class="btn btn-secondary btn-sm">
+                    Print Receipt
+                </button>
+
+                <a href="{% url 'consultations:video_room' appointment.meeting_room_id %}"
+                   class="btn btn-success btn-sm">
+                    Launch Video Room
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

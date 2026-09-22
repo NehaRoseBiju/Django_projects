@@ -1,0 +1,235 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}PulseMind Hub - Care. Connect. Consult.{% endblock %}</title>
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="{% static 'images/logo-icon.svg' %}">
+
+    <!-- Google Fonts & Chart.js -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Main CSS -->
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+
+    {% block extra_css %}{% endblock %}
+</head>
+
+<body>
+
+    <!-- NAVBAR -->
+    <nav class="navbar">
+        <div class="navbar-container">
+
+            <a href="{% url 'dashboard:index' %}" class="navbar-brand">
+                <img src="{% static 'images/logo.svg' %}"
+                     alt="PulseMind Hub"
+                     class="navbar-logo">
+            </a>
+
+            {% if user.is_authenticated %}
+
+                {% if user.is_admin %}
+
+                    <ul class="nav-links">
+
+                        <li>
+                            <a href="{% url 'dashboard:index' %}"
+                               class="nav-link {% if request.resolver_match.app_name == 'dashboard' %}active{% endif %}">
+                                Admin Dashboard
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="{% url 'accounts:admin_user_list' %}"
+                               class="nav-link {% if request.resolver_match.url_name == 'admin_user_list' or request.resolver_match.url_name == 'admin_user_add' or request.resolver_match.url_name == 'admin_user_edit' %}active{% endif %}">
+                                User Management
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="{% url 'accounts:admin_consultations' %}"
+                               class="nav-link {% if request.resolver_match.url_name == 'admin_consultations' %}active{% endif %}">
+                                Consultations Audit
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="{% url 'accounts:admin_payments' %}"
+                               class="nav-link {% if request.resolver_match.url_name == 'admin_payments' %}active{% endif %}">
+                                Financial Audit
+                            </a>
+                        </li>
+
+                    </ul>
+
+                    <div style="display:flex; align-items:center; gap:0.85rem;">
+
+                        <div class="user-badge"
+                             style="background:#fef3c7; color:#92400e; border-color:#fde68a;">
+                            Admin: {{ user.username }}
+                        </div>
+
+                        <a href="{% url 'accounts:logout' %}"
+                           class="btn btn-secondary btn-sm">
+                            Logout
+                        </a>
+
+                    </div>
+
+                {% else %}
+
+                    <ul class="nav-links">
+
+                        <li>
+                            <a href="{% url 'dashboard:index' %}"
+                               class="nav-link {% if request.resolver_match.app_name == 'dashboard' %}active{% endif %}">
+                                Dashboard
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="{% url 'wellness:index' %}"
+                               class="nav-link {% if request.resolver_match.app_name == 'wellness' %}active{% endif %}">
+                                Wellness Tracker
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="{% url 'consultations:doctors' %}"
+                               class="nav-link {% if request.resolver_match.app_name == 'consultations' %}active{% endif %}">
+                                Doctor Consultations
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="{% url 'payments:history' %}"
+                               class="nav-link {% if request.resolver_match.app_name == 'payments' %}active{% endif %}">
+                                Payments
+                            </a>
+                        </li>
+
+                    </ul>
+
+                    <div style="display:flex; align-items:center; gap:0.85rem;">
+
+                        <a href="{% url 'accounts:profile' %}" class="user-badge">
+                            {{ user.get_full_name|default:user.username }}
+                            ({% if user.is_doctor %}Doctor{% else %}Patient{% endif %})
+                        </a>
+
+                        <a href="{% url 'accounts:logout' %}"
+                           class="btn btn-secondary btn-sm">
+                            Logout
+                        </a>
+
+                    </div>
+
+                {% endif %}
+
+            {% else %}
+
+                <div style="display:flex; gap:0.75rem; align-items:center;">
+
+                    <a href="{% url 'accounts:admin_login' %}"
+                       class="btn btn-secondary btn-sm"
+                       style="border-color:#94a3b8; color:#334155; background:#f8fafc;">
+                        Admin Portal
+                    </a>
+
+                    <a href="{% url 'accounts:login' %}"
+                       class="btn btn-secondary btn-sm">
+                        Login
+                    </a>
+
+                    <a href="{% url 'accounts:register' %}"
+                       class="btn btn-primary btn-sm">
+                        Get Started
+                    </a>
+
+                </div>
+
+            {% endif %}
+
+        </div>
+    </nav>
+
+    <!-- ALERT MESSAGES -->
+    {% if messages %}
+    <div style="max-width:1600px; width:96%; margin:1rem auto 0; padding:0 1.5rem;">
+
+        {% for message in messages %}
+
+        <div style="
+            padding:0.85rem 1.25rem;
+            border-radius:var(--radius-sm);
+            margin-bottom:0.5rem;
+            font-weight:500;
+            font-size:0.95rem;
+
+            {% if message.tags == 'error' %}
+                background:#fee2e2;
+                color:#991b1b;
+                border:1px solid #fca5a5;
+            {% elif message.tags == 'success' %}
+                background:#d1fae5;
+                color:#065f46;
+                border:1px solid #6ee7b7;
+            {% else %}
+                background:#e0f2fe;
+                color:#075985;
+                border:1px solid #7dd3fc;
+            {% endif %}
+        ">
+            {{ message }}
+        </div>
+
+        {% endfor %}
+
+    </div>
+    {% endif %}
+
+    <!-- MAIN CONTENT -->
+    <main class="main-wrapper">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- FOOTER -->
+    <footer>
+
+        <div style="
+            max-width:1600px;
+            width:96%;
+            margin:0 auto;
+            padding:0 1.5rem;
+            display:flex;
+            flex-direction:column;
+            align-items:center;
+            gap:0.5rem;
+        ">
+
+            <img src="{% static 'images/logo.svg' %}"
+                 alt="PulseMind Hub"
+                 style="height:36px;">
+
+            <p style="margin-top:0.5rem;">
+                © 2026 PulseMind Hub. Empowering Health & Wellness Through Instant Digital Consultation.
+            </p>
+
+        </div>
+
+    </footer>
+
+    {% block extra_js %}{% endblock %}
+
+</body>
+</html>

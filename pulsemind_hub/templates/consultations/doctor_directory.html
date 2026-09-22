@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+{% block title %}Doctor Directory - PulseMind Hub{% endblock %}
+
+{% block content %}
+<div style="background: white; padding: 1.5rem; border-radius: var(--radius-md); box-shadow: var(--shadow-sm); margin-bottom: 2rem;">
+  <h2 style="margin-bottom: 1rem; color: #064e3b;"> Verified Medical Specialists</h2>
+  <form method="GET" style="display: flex; gap: 1rem; flex-wrap: wrap;">
+    <input type="text" name="search" value="{{ search_query }}" class="form-control" placeholder="Search by Doctor Name..." style="flex: 1; min-width: 200px;">
+    <input type="text" name="specialty" value="{{ specialty_query }}" class="form-control" placeholder="Specialty (e.g. Cardiology, Psychiatry)..." style="flex: 1; min-width: 200px;">
+  </form>
+</div>
+
+<div class="grid-3">
+  {% for doc in doctors %}
+  <div class="card" style="display: flex; flex-direction: column; justify-content: space-between;">
+    <div>
+      <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+        <div style="width: 58px; height: 58px; border-radius: 50%; background: var(--primary-light); color: var(--primary); display: flex; align-items: center; justify-content: justify; font-size: 1.8rem; font-weight: 700; display: flex; align-items: center; justify-content: center;">
+          
+        </div>
+        <div>
+          <h3 style="font-size: 1.15rem; color: #064e3b; margin-bottom: 0.15rem;">Dr. {{ doc.get_full_name|default:doc.username }}</h3>
+          <span class="badge badge-doctor">{{ doc.specialization|default:"General Practice" }}</span>
+        </div>
+      </div>
+
+      <p style="font-size: 0.875rem; color: var(--muted-text); margin-bottom: 1rem; min-height: 48px;">
+        {{ doc.bio|default:"Experienced healthcare practitioner committed to providing high-quality digital consultations." }}
+      </p>
+
+      <div style="font-size: 0.85rem; color: #1e293b; margin-bottom: 1.25rem;">
+        <div><strong>Qualification:</strong> {{ doc.qualification|default:"MBBS, MD" }}</div>
+        <div><strong>Practice:</strong> {{ doc.experience_years }} Years Experience</div>
+        <div><strong>Consultation Fee:</strong> <span style="font-weight: 800; color: #0d9488; font-size: 1rem;">₹{{ doc.consultation_fee }}</span></div>
+      </div>
+    </div>
+
+    <a href="{% url 'consultations:book' doc.id %}" class="btn btn-primary" style="width: 100%;">
+      Select Slot & Book (₹{{ doc.consultation_fee }})
+    </a>
+  </div>
+  {% empty %}
+  <div style="grid-column: 1/-1; text-align: center; padding: 3rem; background: white; border-radius: var(--radius-md);">
+    <p style="color: var(--muted-text);">No doctors found matching your query.</p>
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}

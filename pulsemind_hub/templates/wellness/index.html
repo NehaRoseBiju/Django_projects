@@ -1,0 +1,217 @@
+{% extends 'base.html' %}
+
+{% block title %}Wellness Tracker - PulseMind Hub{% endblock %}
+
+{% block content %}
+
+<div class="card-header" style="border: none; margin-bottom: 1.5rem;">
+
+    <div>
+        <h2>Daily Wellness & Self-Care Portal</h2>
+        <p style="color: var(--muted-text);">
+            Track your mood, sleep quality, physical activity, water intake, and wellness habits.
+        </p>
+    </div>
+
+</div>
+
+<div class="grid-2">
+
+    <!-- DAILY JOURNAL -->
+    <div class="card">
+
+        <div class="card-header">
+            <h3>Daily Reflection & Journal</h3>
+            <a href="{% url 'wellness:add_journal' %}" class="btn btn-primary btn-sm">
+                Log Journal
+            </a>
+        </div>
+
+        {% for j in journals %}
+
+        <div style="background:#f8fafc; border-left:4px solid var(--primary); padding:0.85rem; border-radius:var(--radius-sm); margin-bottom:0.75rem;">
+
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.35rem;">
+
+                <span style="font-weight:700; color:#064e3b; font-size:0.9rem;">
+                    {{ j.get_mood_display }}
+                </span>
+
+                <span style="font-size:0.8rem; color:var(--muted-text);">
+                    {{ j.date }}
+                </span>
+
+            </div>
+
+            <p style="font-size:0.9rem; color:#334155; margin:0;">
+                {{ j.content }}
+            </p>
+
+        </div>
+
+        {% empty %}
+
+        <p style="color:var(--muted-text); font-size:0.9rem; text-align:center; padding:1.5rem 0;">
+            No journal entries logged yet.
+        </p>
+
+        {% endfor %}
+
+    </div>
+
+    <!-- SLEEP -->
+    <div class="card">
+
+        <div class="card-header">
+            <h3>Sleep Monitoring</h3>
+            <a href="{% url 'wellness:add_sleep' %}" class="btn btn-primary btn-sm">
+                Log Sleep
+            </a>
+        </div>
+
+        {% for s in sleeps %}
+
+        <div style="background:#f0fdf4; border:1px solid #bbf7d0; padding:0.85rem; border-radius:var(--radius-sm); margin-bottom:0.75rem; display:flex; justify-content:space-between; align-items:center;">
+
+            <div>
+
+                <div style="font-weight:700; color:#064e3b;">
+                    {{ s.duration_hours }} Hours Sleep
+                </div>
+
+                <div style="font-size:0.8rem; color:var(--muted-text);">
+                    Bed: {{ s.bedtime }} |
+                    Wake: {{ s.wake_time }}
+                </div>
+
+                {% if s.disturbances %}
+                <div style="font-size:0.8rem; color:#991b1b; margin-top:0.2rem;">
+                    Notes: {{ s.disturbances }}
+                </div>
+                {% endif %}
+
+            </div>
+
+            <div style="font-size:0.85rem; font-weight:700; color:#d97706;">
+                Rating: {{ s.quality_rating }}/5
+            </div>
+
+        </div>
+
+        {% empty %}
+
+        <p style="color:var(--muted-text); font-size:0.9rem; text-align:center; padding:1.5rem 0;">
+            No sleep records logged yet.
+        </p>
+
+        {% endfor %}
+
+    </div>
+
+</div>
+
+<div class="grid-2">
+
+    <!-- PHYSICAL ACTIVITY -->
+    <div class="card">
+
+        <div class="card-header">
+            <h3>Physical Activity Log</h3>
+            <a href="{% url 'wellness:add_activity' %}" class="btn btn-primary btn-sm">
+                Log Exercise
+            </a>
+        </div>
+
+        {% for a in activities %}
+
+        <div style="background:#ffffff; border:1px solid #e2e8f0; padding:0.85rem; border-radius:var(--radius-sm); margin-bottom:0.75rem; display:flex; justify-content:space-between; align-items:center;">
+
+            <div>
+
+                <div style="font-weight:700; color:#064e3b;">
+                    {{ a.exercise_type }}
+                </div>
+
+                <div style="font-size:0.8rem; color:var(--muted-text);">
+                    {{ a.duration_minutes }} Mins |
+                    Intensity: {{ a.get_intensity_display }}
+                </div>
+
+            </div>
+
+            <div style="font-weight:800; color:#10b981; font-size:1.1rem;">
+                {{ a.calories_burned }} kcal
+            </div>
+
+        </div>
+
+        {% empty %}
+
+        <p style="color:var(--muted-text); font-size:0.9rem; text-align:center; padding:1.5rem 0;">
+            No exercises recorded yet.
+        </p>
+
+        {% endfor %}
+
+    </div>
+
+    <!-- HABITS -->
+    <div class="card">
+
+        <div class="card-header">
+            <h3>Wellness Habits & Streaks</h3>
+            <a href="{% url 'wellness:add_habit' %}" class="btn btn-primary btn-sm">
+                Create Habit
+            </a>
+        </div>
+
+        {% for h in habits %}
+
+        <div style="display:flex; align-items:center; justify-content:space-between; padding:0.75rem; background:#f8fafc; border-radius:var(--radius-sm); margin-bottom:0.5rem;">
+
+            <div>
+
+                <div style="font-weight:600; color:#0f766e;">
+                    {{ h.title }}
+                </div>
+
+                <div style="font-size:0.8rem; color:var(--muted-text);">
+                    Frequency: {{ h.get_frequency_display }}
+                </div>
+
+            </div>
+
+            <div style="display:flex; align-items:center; gap:0.75rem;">
+
+                <span style="font-size:0.85rem; font-weight:700; color:#d97706;">
+                    {{ h.streak_count }}d streak
+                </span>
+
+                <a href="{% url 'wellness:toggle_habit' h.id %}"
+                   class="btn btn-sm {% if h.is_completed_today %}btn-success{% else %}btn-secondary{% endif %}">
+
+                    {% if h.is_completed_today %}
+                        Done
+                    {% else %}
+                        Mark Done
+                    {% endif %}
+
+                </a>
+
+            </div>
+
+        </div>
+
+        {% empty %}
+
+        <p style="color:var(--muted-text); font-size:0.9rem; text-align:center; padding:1.5rem 0;">
+            No habits tracked. Click Create Habit above.
+        </p>
+
+        {% endfor %}
+
+    </div>
+
+</div>
+
+{% endblock %}

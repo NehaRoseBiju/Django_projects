@@ -1,0 +1,185 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{% if is_edit %}Edit User - {{ target_user.username }}{% else %}Add New User / Doctor{% endif %} - Admin Portal{% endblock %}
+
+{% block content %}
+<div style="max-width: 800px; margin: 0 auto;">
+
+  <!-- PAGE HEADER -->
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+    <div>
+      <h1 style="font-size: 1.75rem; color: #0f172a; margin: 0;">
+        {% if is_edit %}✏️Edit User: {{ target_user.get_full_name|default:target_user.username }}{% else %}Create New User Account{% endif %}
+      </h1>
+      <p style="color: var(--muted-text); font-size: 0.9rem; margin-top: 0.2rem;">
+        {% if is_edit %}Update role, permissions, contact details, or reset credentials{% else %}Register a new Patient, Doctor, or Administrator account directly{% endif %}
+      </p>
+    </div>
+
+    <a href="{% url 'accounts:admin_user_list' %}" class="btn btn-secondary">
+      ← Back to User List
+    </a>
+  </div>
+
+  <!-- FORM CARD -->
+  <div class="card" style="box-shadow: var(--shadow-md); background: #ffffff;">
+    <form method="POST">
+      {% csrf_token %}
+
+      <!-- SECTION 1: ACCOUNT CREDENTIALS & ROLE -->
+      <div style="margin-bottom: 1.5rem; padding-bottom: 1.25rem; border-bottom: 1px solid #e2e8f0;">
+        <h3 style="font-size: 1.1rem; color: #064e3b; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+          Account Identity & Role
+        </h3>
+
+        <div class="grid-2">
+          <div class="form-group">
+            <label class="form-label">Username *</label>
+            {{ form.username }}
+            {% if form.username.errors %}<div style="color: #dc2626; font-size: 0.8rem; margin-top: 0.2rem;">{{ form.username.errors.0 }}</div>{% endif %}
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Email Address *</label>
+            {{ form.email }}
+            {% if form.email.errors %}<div style="color: #dc2626; font-size: 0.8rem; margin-top: 0.2rem;">{{ form.email.errors.0 }}</div>{% endif %}
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="form-group">
+            <label class="form-label">System Role *</label>
+            {{ form.role }}
+            <span style="font-size: 0.75rem; color: var(--muted-text);">Selecting 'Doctor' exposes medical practice fields below.</span>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">{% if is_edit %}Reset Password (Optional){% else %}Account Password *{% endif %}</label>
+            {{ form.new_password }}
+            {% if is_edit %}
+              <span style="font-size: 0.75rem; color: var(--muted-text);">Leave empty to keep current password unchanged.</span>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION 2: PERSONAL INFORMATION -->
+      <div style="margin-bottom: 1.5rem; padding-bottom: 1.25rem; border-bottom: 1px solid #e2e8f0;">
+        <h3 style="font-size: 1.1rem; color: #064e3b; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+          📋 Personal Information
+        </h3>
+
+        <div class="grid-2">
+          <div class="form-group">
+            <label class="form-label">First Name</label>
+            {{ form.first_name }}
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Last Name</label>
+            {{ form.last_name }}
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Phone Number (+91)</label>
+          {{ form.phone }}
+        </div>
+      </div>
+
+      <!-- SECTION 3: DOCTOR PRACTICE DETAILS (Shown dynamically when DOCTOR role selected) -->
+      <div id="doctor_fields_section" style="margin-bottom: 1.5rem; padding-bottom: 1.25rem; border-bottom: 1px solid #e2e8f0; background: #f0fdf4; padding: 1.25rem; border-radius: var(--radius-md); border: 1px solid #a7f3d0;">
+        <h3 style="font-size: 1.1rem; color: #0f766e; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+          🩺 Doctor Consultation & Practice Settings
+        </h3>
+
+        <div class="grid-2">
+          <div class="form-group">
+            <label class="form-label">Specialization</label>
+            {{ form.specialization }}
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Qualification</label>
+            {{ form.qualification }}
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="form-group">
+            <label class="form-label">Consultation Fee (₹)</label>
+            {{ form.consultation_fee }}
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Experience (Years)</label>
+            {{ form.experience_years }}
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Doctor Bio / Profile Summary</label>
+          {{ form.bio }}
+        </div>
+      </div>
+
+      <!-- SECTION 4: PERMISSIONS & STATUS -->
+      <div style="margin-bottom: 1.5rem;">
+        <h3 style="font-size: 1.1rem; color: #064e3b; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+           Account Access & Privileges
+        </h3>
+
+        <div style="display: flex; gap: 2rem; flex-wrap: wrap;">
+          <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: 600; cursor: pointer;">
+            {{ form.is_active }}
+            <span>Account Active (Can log in)</span>
+          </label>
+
+          <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: 600; cursor: pointer;">
+            {{ form.is_staff }}
+            <span>Staff Status (Django Admin access)</span>
+          </label>
+
+          <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: 600; cursor: pointer;">
+            {{ form.is_superuser }}
+            <span>Superuser Status (Full Control)</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- SUBMIT BUTTONS -->
+      <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 2rem;">
+        <a href="{% url 'accounts:admin_user_list' %}" class="btn btn-secondary">
+          Cancel
+        </a>
+        <button type="submit" class="btn btn-primary" style="padding: 0.75rem 2rem; background: linear-gradient(135deg, #0d9488 0%, #064e3b 100%);">
+          {% if is_edit %} Save User Changes{% else %} Create User Account{% endif %}
+        </button>
+      </div>
+
+    </form>
+  </div>
+
+</div>
+
+<!-- Dynamic Toggle Script for Doctor Fields -->
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    const roleSelect = document.getElementById("id_role_select");
+    const docSection = document.getElementById("doctor_fields_section");
+
+    function toggleDocSection() {
+      if (roleSelect && roleSelect.value === "DOCTOR") {
+        docSection.style.display = "block";
+      } else {
+        docSection.style.display = "block"; // Keep visible or dim for convenience, or toggle opacity
+      }
+    }
+
+    if (roleSelect) {
+      roleSelect.addEventListener("change", toggleDocSection);
+    }
+  });
+</script>
+{% endblock %}

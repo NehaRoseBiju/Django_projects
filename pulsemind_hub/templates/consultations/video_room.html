@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Video Consultation Room - PulseMind Hub{% endblock %}
+
+{% block content %}
+<div style="max-width: 1400px; margin: 0 auto;">
+  <!-- CALL HEADER BAR -->
+  <div style="display: flex; align-items: center; justify-content: space-between; background: #ffffff; padding: 1rem 1.5rem; border-radius: var(--radius-md); margin-bottom: 1.25rem; box-shadow: var(--shadow-sm);">
+    <div>
+      <h2 style="font-size: 1.25rem; color: #064e3b; margin-bottom: 0.15rem;">
+        🩺 PulseMind Encrypted Video Room
+      </h2>
+      <div style="font-size: 0.85rem; color: var(--muted-text);">
+        Appointment #{{ appointment.id }} | Patient: <strong>{{ appointment.patient.get_full_name|default:appointment.patient.username }}</strong> & Doctor: <strong>Dr. {{ appointment.doctor.get_full_name|default:appointment.doctor.username }}</strong>
+      </div>
+    </div>
+    
+    <div style="display: flex; align-items: center; gap: 1rem;">
+      <button onclick="simulateParticipantJoin()" class="btn btn-secondary btn-sm" style="border-color: #0d9488; color: #0d9488;">
+        ▶ Simulate Remote Join
+      </button>
+      <div style="background: #ecfdf5; border: 1px solid #6ee7b7; padding: 0.4rem 0.85rem; border-radius: 50px; font-weight: 700; color: #047857; font-size: 0.9rem;">
+        ⏱️ <span id="callTimer">00:00</span>
+      </div>
+      <span class="badge badge-paid">Encrypted WebRTC</span>
+    </div>
+  </div>
+
+  <!-- MAIN WEBRTC VIDEO CONTAINER -->
+  <div class="video-call-wrapper">
+    <!-- VIDEO VIEW AREA -->
+    <div class="video-view-area">
+      <div class="main-video-container">
+        <!-- Remote Video (Hidden until remote peer joins) -->
+        <video id="remoteVideo" autoplay playsinline class="remote-video" style="display: none;"></video>
+        
+        <!-- REMOTE WAITING SCREEN OVERLAY -->
+        <div id="remoteWaitingOverlay" style="display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; color: white; padding: 2rem;">
+          <div style="width: 100px; height: 100px; border-radius: 50%; background: rgba(45, 212, 191, 0.2); border: 3px solid #2dd4bf; display: flex; align-items: center; justify-content: center; font-size: 3rem; margin-bottom: 1.25rem; animation: pulseGlow 2s infinite;">
+            {% if is_doctor %}{% else %}{% endif %}
+          </div>
+
+          <h3 style="color: #ffffff; font-size: 1.4rem; margin-bottom: 1.25rem;">
+            Awaiting {% if is_doctor %}{{ appointment.patient.get_full_name|default:appointment.patient.username }}{% else %}Dr. {{ appointment.doctor.get_full_name|default:appointment.doctor.username }}{% endif %}...
+          </h3>
+
+          <button onclick="simulateParticipantJoin()" class="btn btn-success btn-sm" style="box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);">
+            ▶ Click to Connect Demo Remote Stream
+          </button>
+        </div>
+
+        <!-- Local PIP Video -->
+        <div class="local-video-pip">
+          <video id="localVideo" autoplay playsinline muted></video>
+        </div>
+
+        <!-- Status overlay -->
+        <div id="callStatus" style="position: absolute; top: 15px; left: 15px; background: rgba(0,0,0,0.65); backdrop-filter: blur(4px); color: #ffffff; padding: 0.35rem 0.85rem; border-radius: 50px; font-size: 0.8rem; border: 1px solid rgba(255,255,255,0.2);">
+          Initializing Room...
+        </div>
+      </div>
+
+      <!-- CONTROLS BAR -->
+      <div class="video-controls-bar">
+        <button id="btnMuteAudio" onclick="toggleAudio()" class="btn-ctrl" title="Mute/Unmute Mic">🎙️</button>
+        <button id="btnToggleVideo" onclick="toggleVideo()" class="btn-ctrl" title="Turn Camera On/Off">📹</button>
+        <button onclick="shareScreen()" class="btn-ctrl" title="Share Screen">🖥️</button>
+        <button onclick="endCall()" class="btn-ctrl end-call" title="End Consultation Call">📞</button>
+      </div>
+    </div>
+
+    <!-- IN-CALL CHAT SIDEBAR -->
+    <div class="chat-sidebar">
+      <div class="chat-header">
+        Consultation Chat
+      </div>
+
+      <div id="chatMessages" class="chat-messages">
+        <div class="chat-msg received" style="background: #f0fdf4; color: #065f46;">
+          Room initialized. Encrypted peer-to-peer session ready.
+        </div>
+      </div>
+
+      <form id="chatForm" class="chat-input-area">
+        <input type="text" id="chatInput" class="form-control" placeholder="Type a message..." required>
+        <button type="submit" class="btn btn-primary btn-sm">Send</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<style>
+@keyframes pulseGlow {
+  0% { box-shadow: 0 0 0 0 rgba(45, 212, 191, 0.4); }
+  70% { box-shadow: 0 0 0 20px rgba(45, 212, 191, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(45, 212, 191, 0); }
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/webrtc_call.js' %}"></script>
+{% endblock %}

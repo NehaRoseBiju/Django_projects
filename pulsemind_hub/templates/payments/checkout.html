@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Pre-Booking Payment Gateway - PulseMind Hub{% endblock %}
+
+{% block content %}
+<div style="max-width: 540px; margin: 1.5rem auto;">
+  <div class="card" style="box-shadow: var(--shadow-lg); padding: 0; overflow: hidden; border-top: 6px solid var(--primary);">
+    <!-- PAYMENT HEADER BANNER -->
+    <div style="background: linear-gradient(135deg, #0d9488 0%, #064e3b 100%); color: white; padding: 1.75rem; text-align: center;">
+      <img src="{% static 'images/logo.svg' %}" alt="PulseMind Hub" style="height: 48px; filter: brightness(0) invert(1); margin-bottom: 0.5rem;">
+      <h2 style="color: white; font-size: 1.4rem; margin: 0;">Pre-Booking Payment Gateway</h2>
+      <p style="font-size: 0.85rem; opacity: 0.9; margin-top: 0.25rem;">Secure Encrypted Pre-Consultation Payment (INR ₹)</p>
+    </div>
+
+    <!-- ORDER SUMMARY BOX -->
+    <div style="padding: 1.5rem; background: #f0fdf4; border-bottom: 1px solid #d1fae5;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+        <span style="font-size: 0.9rem; color: var(--muted-text);">Doctor Consultation:</span>
+        <strong style="color: #064e3b;">Dr. {{ doctor.get_full_name|default:doctor.username }}</strong>
+      </div>
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+        <span style="font-size: 0.9rem; color: var(--muted-text);">Specialty & Slot:</span>
+        <span style="font-size: 0.85rem; font-weight: 600;">{{ appointment.appointment_date }} @ {{ appointment.appointment_time }}</span>
+      </div>
+      <hr style="border: 0; border-top: 1px dashed #a7f3d0; margin: 0.75rem 0;">
+      <div style="display: flex; justify-content: space-between; align-items: center; font-size: 1.1rem;">
+        <strong style="color: #064e3b;">Total Amount Payable:</strong>
+        <strong style="color: #0d9488; font-size: 1.35rem;">₹{{ fee }}</strong>
+      </div>
+    </div>
+
+    <!-- PAYMENT METHOD SELECTOR & FORM -->
+    <div style="padding: 1.75rem;">
+      <form method="POST">
+        {% csrf_token %}
+
+        <label class="form-label" style="margin-bottom: 0.75rem;">Select Payment Option</label>
+        <div class="payment-method-selector">
+          <div class="method-box active" onclick="selectMethod('UPI', this)">
+            UPI / GPay / PhonePe
+          </div>
+          <div class="method-box" onclick="selectMethod('CARD', this)">
+            RuPay / Debit / Credit Card
+          </div>
+          <div class="method-box" onclick="selectMethod('NETBANKING', this)">
+            Net Banking
+          </div>
+        </div>
+        <input type="hidden" name="payment_method" id="selectedPaymentMethod" value="UPI">
+
+        <!-- UPI / CARD FIELDS -->
+        <div id="paymentInputs">
+          <div class="form-group" id="upiGroup">
+            <label class="form-label">UPI ID / VPA</label>
+            <input type="text" class="form-control" placeholder="user@okicici / user@upi" value="patient.john@okaxis" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Full Name</label>
+            <input type="text" class="form-control" value="{{ user.get_full_name|default:user.username }}" required>
+          </div>
+        </div>
+
+        <div style="font-size: 0.8rem; color: var(--muted-text); display: flex; align-items: center; gap: 0.4rem; margin-bottom: 1.25rem;">
+          Secured via NPCI & 256-bit Bank Grade SSL Encryption. Instant Confirmation.
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="width: 100%; padding: 0.85rem; font-size: 1.05rem;">
+          Pay ₹{{ fee }} & Confirm Booking
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  function selectMethod(method, element) {
+    document.querySelectorAll('.method-box').forEach(el => el.classList.remove('active'));
+    element.classList.add('active');
+    document.getElementById('selectedPaymentMethod').value = method;
+  }
+</script>
+{% endblock %}

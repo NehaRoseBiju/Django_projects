@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 200" width="100%" height="100%">
+  <defs>
+    <linearGradient id="tealGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2dd4bf"/>
+      <stop offset="50%" stop-color="#0d9488"/>
+      <stop offset="100%" stop-color="#115e59"/>
+    </linearGradient>
+    <linearGradient id="mintGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#5eead4"/>
+      <stop offset="100%" stop-color="#0f766e"/>
+    </linearGradient>
+    <filter id="softShadow" x="-10%" y="-10%" width="130%" height="130%">
+      <feDropShadow dx="2" dy="4" stdDeviation="4" flood-color="#0f766e" flood-opacity="0.15"/>
+    </filter>
+  </defs>
+
+  <!-- Heart Base Path -->
+  <g transform="translate(20, 15)" filter="url(#softShadow)">
+    <!-- Main Heart Gradient -->
+    <path d="M 85,150 C 40,110 10,75 10,48 C 10,25 28,10 50,10 C 65,10 78,18 85,30 C 92,18 105,10 120,10 C 142,10 160,25 160,48 C 160,75 130,110 85,150 Z" 
+          fill="url(#tealGrad)" transform="scale(0.95)" />
+          
+    <!-- Pulse Line overlay -->
+    <path d="M 22,78 L 48,78 L 56,62 L 68,98 L 80,42 L 92,90 L 100,78 L 140,78" 
+          fill="none" stroke="#ffffff" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
+
+    <!-- Doctor Cross Badge -->
+    <g transform="translate(108, 22)">
+      <circle cx="24" cy="24" r="22" fill="#ffffff" />
+      <circle cx="24" cy="24" r="18" fill="url(#mintGrad)" />
+      <!-- Medical Cross -->
+      <path d="M 21,12 H 27 V 21 H 36 V 27 H 27 V 36 H 21 V 27 H 12 V 21 H 21 Z" fill="#ffffff" />
+    </g>
+
+    <!-- Leaf Accents -->
+    <path d="M 142,12 C 148,4 158,2 164,8 C 164,16 156,22 148,20 Z" fill="#34d399" />
+    <path d="M 136,22 C 142,16 150,16 154,20 C 152,26 144,30 138,28 Z" fill="#10b981" />
+  </g>
+
+  <!-- Brand Typography -->
+  <text x="190" y="95" font-family="'Outfit', 'Inter', 'Segoe UI', sans-serif" font-weight="800" font-size="46" fill="#0f766e" letter-spacing="-0.5">
+    Pulse<tspan fill="#0d9488">Mind</tspan> <tspan fill="#042f2e">Hub</tspan>
+  </text>
+  
+  <text x="195" y="128" font-family="'Inter', 'Segoe UI', sans-serif" font-weight="600" font-size="16" fill="#14b8a6" letter-spacing="3">
+    CARE. CONNECT. CONSULT.
+  </text>
+  
+  <!-- Subtle line separator -->
+  <line x1="195" y1="142" x2="480" y2="142" stroke="#ccfbf1" stroke-width="2" stroke-linecap="round"/>
+</svg>

@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+
+{% block title %}My Consultations - PulseMind Hub{% endblock %}
+
+{% block content %}
+<div class="card" style="background: #ffffff; box-shadow: var(--shadow-sm);">
+  <div class="card-header">
+    <h2 style="color: #064e3b; margin: 0;">🩺 My Consultation Appointments</h2>
+    {% if not user.is_doctor %}
+    <a href="{% url 'consultations:doctors' %}" class="btn btn-primary btn-sm">+ Book New Doctor</a>
+    {% endif %}
+  </div>
+
+  {% if appointments %}
+  <div style="overflow-x: auto;">
+    <table style="width: 100%; border-collapse: collapse; margin-top: 1rem;">
+      <thead>
+        <tr style="border-bottom: 2px solid #e2e8f0; text-align: left; font-size: 0.85rem; color: var(--muted-text);">
+          <th style="padding: 0.75rem;">Appt ID</th>
+          <th style="padding: 0.75rem;">{% if user.is_doctor %}Patient{% else %}Doctor{% endif %}</th>
+          <th style="padding: 0.75rem;">Date & Time</th>
+          <th style="padding: 0.75rem;">Fee</th>
+          <th style="padding: 0.75rem;">Status & Payment</th>
+          <th style="padding: 0.75rem; text-align: right;">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for appt in appointments %}
+        <tr style="border-bottom: 1px solid #f1f5f9; font-size: 0.9rem; {% if appt.status == 'CANCELLED' %}background: #fcf8f8; opacity: 0.75;{% endif %}">
+          <td style="padding: 1rem; font-weight: 700; color: #0f172a;">#APPT-{{ appt.id }}</td>
+          
+          <td style="padding: 1rem;">
+            {% if user.is_doctor %}
+              <div style="font-weight: 600; color: #0f172a;">👤 {{ appt.patient.get_full_name|default:appt.patient.username }}</div>
+            {% else %}
+              <div style="font-weight: 600; color: #0f766e;">👨‍⚕️ Dr. {{ appt.doctor.get_full_name|default:appt.doctor.username }}</div>
+              <div style="font-size: 0.8rem; color: var(--muted-text);">{{ appt.doctor.specialization }}</div>
+            {% endif %}
+          </td>
+
+          <td style="padding: 1rem;">
+            <div>📅 {{ appt.appointment_date }}</div>
+            <div style="font-size: 0.8rem; color: var(--muted-text);">⏰ {{ appt.appointment_time|time:"H:i" }}</div>
+          </td>
+
+          <td style="padding: 1rem; font-weight: 700; color: #047857;">₹{{ appt.fee }}</td>
+
+          <td style="padding: 1rem;">
+            {% if appt.status == 'CANCELLED' %}
+              <span class="badge" style="background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5;">
+                ❌ CANCELLED / REFUNDED
+              </span>
+            {% elif appt.payment_status == 'PAID' %}
+              <span class="badge badge-paid">🟢 PAID & CONFIRMED</span>
+            {% else %}
+              <span class="badge badge-pending">🟡 PAYMENT PENDING</span>
+            {% endif %}
+          </td>
+
+          <td style="padding: 1rem; text-align: right;">
+            {% if appt.status != 'CANCELLED' %}
+              <div style="display: flex; gap: 0.5rem; justify-content: flex-end; align-items: center;">
+                {% if appt.payment_status == 'PAID' %}
+                  <a href="{% url 'consultations:video_room' appt.meeting_room_id %}" class="btn btn-success btn-sm">
+                    📹 Join Video Room
+                  </a>
+                {% else %}
+                  <a href="{% url 'payments:checkout' appt.id %}" class="btn btn-primary btn-sm">
+                    💳 Pay Now (₹{{ appt.fee }})
+                  </a>
+                {% endif %}
+
+                <!-- CANCEL BOOKING BUTTON -->
+                <form method="POST" action="{% url 'consultations:cancel_appointment' appt.id %}" style="display: inline;" onsubmit="return confirm('Are you sure you want to cancel appointment booking #APPT-{{ appt.id }}? The reserved time slot will be freed.');">
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-sm" style="background: #fff1f2; color: #e11d48; border: 1px solid #fecdd3;" title="Cancel Appointment Booking">
+                    ❌ Cancel Booking
+                  </button>
+                </form>
+              </div>
+            {% else %}
+              <span style="font-size: 0.85rem; color: #991b1b; font-weight: 500;">Booking Cancelled</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div style="text-align: center; padding: 3rem; color: var(--muted-text);">
+    <p>No consultation appointments recorded.</p>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

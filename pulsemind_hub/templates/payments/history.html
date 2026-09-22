@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+
+{% block title %}Payment History - PulseMind Hub{% endblock %}
+
+{% block content %}
+
+<div class="card">
+
+    <div class="card-header">
+        <h2>Payment Transaction History</h2>
+    </div>
+
+    {% if payments %}
+
+    <table style="width: 100%; border-collapse: collapse; margin-top: 1rem;">
+
+        <thead>
+            <tr style="border-bottom: 2px solid #e2e8f0; text-align: left; font-size: 0.85rem; color: var(--muted-text);">
+
+                <th style="padding: 0.75rem;">Transaction ID</th>
+
+                <th style="padding: 0.75rem;">
+                    {% if user.is_doctor %}
+                        Patient
+                    {% else %}
+                        Doctor
+                    {% endif %}
+                </th>
+
+                <th style="padding: 0.75rem;">Amount</th>
+
+                <th style="padding: 0.75rem;">Payment Method</th>
+
+                <th style="padding: 0.75rem;">Date</th>
+
+                <th style="padding: 0.75rem; text-align: right;">Receipt</th>
+
+            </tr>
+        </thead>
+
+        <tbody>
+
+            {% for p in payments %}
+
+            <tr style="border-bottom: 1px solid #f1f5f9; font-size: 0.9rem;">
+
+                <td style="padding: 1rem; font-family: monospace; font-weight: 700; color: #0f766e;">
+                    {{ p.transaction_id }}
+                </td>
+
+                <td style="padding: 1rem;">
+
+                    {% if user.is_doctor %}
+
+                        {{ p.patient.get_full_name|default:p.patient.username }}
+
+                    {% else %}
+
+                        Dr. {{ p.doctor.get_full_name|default:p.doctor.username }}
+
+                    {% endif %}
+
+                </td>
+
+                <td style="padding: 1rem; font-weight: 800; color: #0d9488;">
+                    ₹{{ p.amount }}
+                </td>
+
+                <td style="padding: 1rem;">
+                    {{ p.get_payment_method_display }}
+                </td>
+
+                <td style="padding: 1rem; color: var(--muted-text);">
+                    {{ p.created_at|date:"M d, Y" }}
+                </td>
+
+                <td style="padding: 1rem; text-align: right;">
+
+                    <a href="{% url 'payments:receipt' p.transaction_id %}"
+                       class="btn btn-secondary btn-sm">
+                        View Invoice
+                    </a>
+
+                </td>
+
+            </tr>
+
+            {% endfor %}
+
+        </tbody>
+
+    </table>
+
+    {% else %}
+
+    <div style="text-align: center; padding: 3rem; color: var(--muted-text);">
+        No payment transactions found.
+    </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}

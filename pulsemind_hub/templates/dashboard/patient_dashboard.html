@@ -1,0 +1,349 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Patient Dashboard - PulseMind Hub{% endblock %}
+
+{% block content %}
+
+<!-- WELCOME BANNER -->
+<div style="background: linear-gradient(135deg, #0d9488 0%, #064e3b 100%); color: #ffffff; padding: 2rem; border-radius: var(--radius-lg); margin-bottom: 2rem; box-shadow: var(--shadow-md); position: relative; overflow: hidden;">
+
+    <div style="position: relative; z-index: 2;">
+        <span style="background: rgba(255,255,255,0.2); padding: 0.35rem 0.85rem; border-radius: 50px; font-size: 0.8rem; font-weight: 600; text-transform: uppercase;">
+            Welcome Back, {{ user.get_full_name|default:user.username }}
+        </span>
+
+        <h1 style="color: #ffffff; margin: 0.5rem 0 0.25rem; font-size: 2rem;">
+            Wellness & Video Consultation Portal
+        </h1>
+
+        <p style="opacity: 0.9; font-size: 0.95rem; max-width: 650px;">
+            <i>"{{ motivation }}"</i>
+        </p>
+    </div>
+
+    <img src="{% static 'images/logo-icon.svg' %}"
+         style="position: absolute; right: -20px; bottom: -30px; opacity: 0.15; width: 220px; pointer-events: none;">
+</div>
+
+<!-- STATS SUMMARY ROW -->
+<div class="grid-4" style="margin-bottom: 2rem;">
+
+    <div class="stat-card">
+        <div class="stat-icon">W</div>
+        <div>
+            <div class="stat-value">{{ water.glasses_logged }} / {{ water.goal_glasses }}</div>
+            <div class="stat-label">Hydration (Glasses)</div>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon" style="background: #ecfdf5; color: #10b981;">A</div>
+        <div>
+            <div class="stat-value">{{ upcoming_appointments.count }}</div>
+            <div class="stat-label">Upcoming Consults</div>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon" style="background: #fef3c7; color: #d97706;">S</div>
+        <div>
+            <div class="stat-value">
+                {% with habits.first as top_habit %}
+                    {{ top_habit.streak_count|default:0 }} Days
+                {% endwith %}
+            </div>
+            <div class="stat-label">Top Habit Streak</div>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon" style="background: #f3e8ff; color: #9333ea;">J</div>
+        <div>
+            <div class="stat-value">{{ recent_journals.count }}</div>
+            <div class="stat-label">Journal Entries</div>
+        </div>
+    </div>
+
+</div>
+
+<!-- MAIN CONTENT GRID -->
+<div class="grid-2">
+
+    <!-- LEFT COLUMN -->
+    <div>
+
+        <!-- UPCOMING CONSULTATIONS -->
+        <div class="card">
+
+            <div class="card-header">
+                <h3>Upcoming Consultations</h3>
+                <a href="{% url 'consultations:doctors' %}" class="btn btn-primary btn-sm">
+                    Book Doctor
+                </a>
+            </div>
+
+            {% if upcoming_appointments %}
+
+                {% for appt in upcoming_appointments %}
+
+                <div style="background: var(--primary-subtle); border: 1px solid #a7f3d0; border-radius: var(--radius-sm); padding: 1rem; margin-bottom: 1rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.75rem;">
+
+                    <div>
+
+                        <div style="font-weight: 700; color: #064e3b; font-size: 1.05rem;">
+                            Dr. {{ appt.doctor.get_full_name|default:appt.doctor.username }}
+                        </div>
+
+                        <div style="font-size: 0.85rem; color: var(--muted-text);">
+                            Specialty: {{ appt.doctor.specialization|default:"General Practice" }}
+                        </div>
+
+                        <div style="font-size: 0.85rem; font-weight: 600; color: var(--primary); margin-top: 0.25rem;">
+                            {{ appt.appointment_date }} at {{ appt.appointment_time|time:"H:i" }}
+                        </div>
+
+                    </div>
+
+                    <div style="display: flex; gap: 0.5rem; align-items: center;">
+
+                        {% if appt.payment_status == 'PAID' %}
+
+                            <a href="{% url 'consultations:video_room' appt.meeting_room_id %}"
+                               class="btn btn-success btn-sm">
+                                Join Video Call
+                            </a>
+
+                        {% else %}
+
+                            <a href="{% url 'payments:checkout' appt.id %}"
+                               class="btn btn-secondary btn-sm"
+                               style="border-color: #d97706; color: #d97706;">
+                                Pay ₹{{ appt.fee }}
+                            </a>
+
+                        {% endif %}
+
+                        <form method="POST"
+                              action="{% url 'consultations:cancel_appointment' appt.id %}"
+                              style="display: inline;"
+                              onsubmit="return confirm('Cancel appointment booking with Dr. {{ appt.doctor.get_full_name|default:appt.doctor.username }}?');">
+
+                            {% csrf_token %}
+
+                            <button type="submit"
+                                    class="btn btn-sm"
+                                    style="background: #fff1f2; color: #e11d48; border: 1px solid #fecdd3;"
+                                    title="Cancel Booking">
+                                Cancel
+                            </button>
+
+                        </form>
+
+                    </div>
+
+                </div>
+
+                {% endfor %}
+
+            {% else %}
+
+                <div style="text-align: center; padding: 2rem 1rem; color: var(--muted-text);">
+                    <p>No upcoming video consultations scheduled.</p>
+
+                    <a href="{% url 'consultations:doctors' %}"
+                       class="btn btn-secondary btn-sm"
+                       style="margin-top: 0.75rem;">
+                        Browse Available Doctors
+                    </a>
+                </div>
+
+            {% endif %}
+
+        </div>
+
+        <!-- HYDRATION & HABITS -->
+        <div class="card">
+
+            <div class="card-header">
+                <h3>Daily Hydration & Habits</h3>
+
+                <a href="{% url 'wellness:index' %}"
+                   class="btn btn-secondary btn-sm">
+                    Full Tracker
+                </a>
+            </div>
+
+            <div style="background: #f0fdf4; border-radius: var(--radius-sm); padding: 1rem; margin-bottom: 1.25rem; display: flex; align-items: center; justify-content: space-between;">
+
+                <div>
+                    <div style="font-weight: 600; color: #064e3b;">
+                        Hydration Counter
+                    </div>
+
+                    <div style="font-size: 0.85rem; color: var(--muted-text);">
+                        Logged {{ water.glasses_logged }} of {{ water.goal_glasses }} glasses today
+                    </div>
+                </div>
+
+                <form method="POST"
+                      action="{% url 'wellness:log_water' %}"
+                      style="display: flex; gap: 0.5rem;">
+
+                    {% csrf_token %}
+
+                    <button type="submit"
+                            name="action"
+                            value="add"
+                            class="btn btn-primary btn-sm">
+                        + 1 Glass
+                    </button>
+
+                </form>
+
+            </div>
+
+            <div>
+
+                <h4 style="font-size: 0.95rem; margin-bottom: 0.75rem; color: #0f766e;">
+                    Active Habits Streak
+                </h4>
+
+                {% for habit in habits %}
+
+                <div style="display: flex; align-items: center; justify-content: space-between; padding: 0.6rem 0; border-bottom: 1px dashed #e2e8f0;">
+
+                    <span style="font-weight: 500; font-size: 0.9rem;">
+                        {{ habit.title }}
+                    </span>
+
+                    <div style="display: flex; align-items: center; gap: 0.75rem;">
+
+                        <span style="font-size: 0.8rem; font-weight: 700; color: #d97706;">
+                            {{ habit.streak_count }}d
+                        </span>
+
+                        <a href="{% url 'wellness:toggle_habit' habit.id %}"
+                           class="btn btn-sm {% if habit.is_completed_today %}btn-success{% else %}btn-secondary{% endif %}">
+
+                            {% if habit.is_completed_today %}
+                                Completed
+                            {% else %}
+                                Mark Done
+                            {% endif %}
+
+                        </a>
+
+                    </div>
+
+                </div>
+
+                {% empty %}
+
+                <p style="font-size: 0.85rem; color: var(--muted-text);">
+                    No wellness habits set yet. Add one in the Wellness tab!
+                </p>
+
+                {% endfor %}
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- RIGHT COLUMN -->
+    <div>
+
+        <div class="card">
+
+            <div class="card-header">
+                <h3>Sleep Monitoring Trend (Hours)</h3>
+            </div>
+
+            <div style="height: 220px; position: relative;">
+                <canvas id="sleepChart"></canvas>
+            </div>
+
+        </div>
+
+        <div class="card">
+
+            <div class="card-header">
+                <h3>Daily Exercise Calories Burned</h3>
+            </div>
+
+            <div style="height: 220px; position: relative;">
+                <canvas id="activityChart"></canvas>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+
+<script>
+const dayLabels = JSON.parse('{{ day_labels_json|escapejs }}');
+const sleepData = JSON.parse('{{ sleep_data_json|escapejs }}');
+const activityData = JSON.parse('{{ activity_data_json|escapejs }}');
+
+const sleepCtx = document.getElementById('sleepChart').getContext('2d');
+
+new Chart(sleepCtx, {
+    type: 'line',
+    data: {
+        labels: dayLabels,
+        datasets: [{
+            label: 'Sleep Duration (Hours)',
+            data: sleepData,
+            borderColor: '#0d9488',
+            backgroundColor: 'rgba(13, 148, 136, 0.15)',
+            fill: true,
+            tension: 0.35,
+            borderWidth: 3,
+            pointBackgroundColor: '#064e3b'
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+            y: {
+                beginAtZero: true,
+                max: 12
+            }
+        }
+    }
+});
+
+const actCtx = document.getElementById('activityChart').getContext('2d');
+
+new Chart(actCtx, {
+    type: 'bar',
+    data: {
+        labels: dayLabels,
+        datasets: [{
+            label: 'Calories Burned (kcal)',
+            data: activityData,
+            backgroundColor: '#10b981',
+            borderRadius: 8
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+            y: {
+                beginAtZero: true
+            }
+        }
+    }
+});
+</script>
+
+{% endblock %}
